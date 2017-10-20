@@ -1,4 +1,4 @@
-var app = angular.module("myApp", ['ngRoute']); 
+var app = angular.module("myApp", ['ngRoute',"ui.tree"]); 
 //判断是否为电脑端
 function IsPC(){
     var userAgentInfo = navigator.userAgent;
@@ -14,6 +14,7 @@ function IsPC(){
     }
     return flag;
 }
+
 //如果是电脑端，则正常显示，否则则无法访问
 // if(!IsPC()){
 	// document.body.innerHTML = "暂时还没有手机页面哦~~~~~";
@@ -55,29 +56,6 @@ function getUrl(url){
 	}
 	return Request;
 };
-//控制顶部导航栏收起展开
-$(document).ready(function(){
-    $(document).scroll(function(){
-        var top = $(document).scrollTop();
-        if(top > 100){
-			$('.navbar').attr('class','navbar navbar-min');
-			$('.nav-box .pic').attr('class','pic show');
-			$('.min-user-state').attr('class','user-state min-user-state');
-		}
-		if(top < 100){
-			$('.navbar').attr('class','navbar');
-			$('.nav-box .pic').attr('class','pic');
-			$('.min-user-state').attr('class','user-state min-user-state hidden');
-		}
-		//隐藏/显示返回顶部的按钮
-		if(top > 1000){
-			$('.footer .pic-top').attr('class','pic pic-top pic-show');
-		}
-		if(top < 1000){
-			$('.footer .pic-top').attr('class','pic pic-top');
-		}
-    });
-});
 
 //美洽客服
 (function(m, ei, q, i, a, j, s) {
@@ -96,59 +74,6 @@ _MEIQIA('entId', '44676');
 
  _MEIQIA('withoutBtn');
 _MEIQIA('init');
-
-$(document).ready(function(){
-	//banner图素材移动位置
-	setTimeout(function(){
-		$('.pic-group .pic').attr('class','pic move');
-		$('.pic-group .example-text').attr('class','example-text move');
-		
-		//点击按钮，回到页面顶部
-		$(".footer .pic-top").click(function() {
-		   $("html,body").animate({scrollTop:0}, 1000);
-		}); 
-		
-		//弹出客服对话框
-		$('.online-service').click(function(){
-			var userData = {
-				name:$('.contact-name').val(),
-				phone:$('.contact-phone').val(),
-				email:$('.contact-email').val(),
-				company:$('.contact-company').val()
-			};
-			console.log(userData.name);
-			_MEIQIA('showPanel');
-			if(userData.name){
-				_MEIQIA('metadata', {
-					comment:'一传互动客户',
-					name: userData.name,
-				})
-			}
-			if(userData.phone){
-				_MEIQIA('metadata', {
-					comment:'一传互动客户',
-					tel: userData.phone
-				})
-			}
-			if(userData.email){
-				_MEIQIA('metadata', {
-					comment:'一传互动客户',
-					email: userData.email
-				})
-			}
-			if(userData.company){
-				_MEIQIA('metadata', {
-					comment:'一传互动客户',
-					公司名称: userData.company
-				})
-			}
-			
-			
-		})
-	},0);
-});
-
-
 
 
 
@@ -327,55 +252,37 @@ app.controller("user-state", ['$scope',function($scope) {
 	};
 }]);
 
-
-    
-
+//头部
 app.controller("header", ['$scope',function($scope) {
-    $scope.list = [
-		{id:1,name:'平台概况',className:'active',src:'index.html'},
-		{id:2,name:'广告合作',className:'',src:'adCooperate.html'},
-		{id:3,name:'代理合作',className:'',src:'agent.html'},
-		{id:4,name:'流量变现',className:'',src:'flow.html'},
-		{id:5,name:'广告类型',className:'',src:'adType.html'},
-		{id:6,name:'加入我们',className:'',src:'recruit.html'},
-		
-	];
-	$scope.choosePage = function(e){
-		window.open(e.item.src + '?pageId=' + e.item.id,'_self');
-	}
-	var pageId = getUrl(location.search).pageId
-	if(pageId){
-		for(var i = 0;i < $scope.list.length;i++){
-			$scope.list[i].className = '';
+	$scope.minNav = function(){
+		if($('.min-nav-box').length == 0){
+			$('.nav-box').addClass("min-nav-box");
+			$('.layui-body').css('left','50px');
+		}else{
+			$('.nav-box').removeClass("min-nav-box");
+			$('.layui-body').css('left','200px');
 		}
-		$scope.list[pageId - 1].className = 'active';
-	}else{
-		
-	}
+	};
 }]);
 
-app.controller("companyList", ['$scope',function($scope) {
-    $scope.list = [
-		{id:1,url:'img/companyList/1.png'},
-		{id:2,url:'img/companyList/2.png'},
-		{id:3,url:'img/companyList/3.png'},
-		{id:4,url:'img/companyList/4.png'},
-		{id:5,url:'img/companyList/5.png'},
-		{id:6,url:'img/companyList/6.png'},
-		{id:7,url:'img/companyList/7.png'},
-		{id:8,url:'img/companyList/8.png'},
-		{id:9,url:'img/companyList/9.png'},
-		{id:10,url:'img/companyList/10.png'},
-		{id:11,url:'img/companyList/11.png'},
-		{id:12,url:'img/companyList/12.png'},
-		{id:13,url:'img/companyList/13.png'},
-		{id:14,url:'img/companyList/14.png'},
-		{id:15,url:'img/companyList/15.png'},
-		{id:16,url:'img/companyList/16.png'},
-		{id:17,url:'img/companyList/17.png'},
-		{id:18,url:'img/companyList/18.png'}
-	];
+//导航条
+app.controller("nav", ['$scope',function($scope) {
 }]);
+
+
+//通过angularjs的路由功能实现页面切换
+app.config(['$routeProvider', function($routeProvider){
+	$routeProvider
+	.when('/',{templateUrl:'./body/index.html'})
+	.when('/vip-profit',{templateUrl:'./body/vip-profit.html'})
+	.when('/ader-profit',{templateUrl:'./body/ader-profit.html'})
+	.when('/agent-profit',{templateUrl:'./body/agent-profit.html'})
+	.when('/company-manage',{templateUrl:'./body/company-manage.html'})
+	.when('/user-mannage',{templateUrl:'./body/user-mannage.html'})
+	.when('/ader-manege',{templateUrl:'./body/ader-manege.html'})
+	.otherwise({redirectTo:'/'});
+}]);
+
 
 
 
